@@ -32,7 +32,8 @@ const defaultErrorResponse = (textError, url) => {
 const successResponse = (pa11yResponse, url) => {
   const issues = pa11yResponse.issues;
   const issueCountByType = countIssuesByType(issues);
-  const { countAprovedIssues, accessible } = isAccessible(issues);
+  const errorIssues = issues.filter((issue) => issue.typeCode === 1);
+  const { countAprovedIssues, accessible } = isAccessible(errorIssues);
 
   return {
     data: { ...pa11yResponse, pageUrl: url },

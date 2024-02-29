@@ -1,3 +1,39 @@
+const baseUrl = "https://www.w3.org/WAI/WCAG21/Techniques/";
+const defaultGuideLink = "https://www.w3.org/TR/WCAG20/";
+
+const techniqueTypeFull = {
+  ARIA: "aria",
+  SCR: "client-side-script",
+  C: "css",
+  F: "failures",
+  G: "general",
+  H: "html",
+  PDF: "pdf",
+  SVR: "server-side-script",
+  SL: "silverlight",
+  SM: "smil",
+  T: "text",
+};
+
+function mapIssuesWithGuideLink(issues) {
+  return issues.map((issue) => {
+    const parts = issue.code.split("_").pop();
+    const secondPards = parts.split(".");
+    secondPards.shift();
+    const codes = secondPards.join(".").split(",");
+    let guideLinks = [];
+    if (!codes[0]) {
+      return { ...issue, guideLinks: [defaultGuideLink] };
+    }
+    guideLinks = codes.map((code) => {
+      const techniqueType = code.match(/[A-Z]+/)[0];
+      const techniqueNumber = code.match(/[0-9]+/)[0];
+      return `${baseUrl}${techniqueTypeFull[techniqueType]}/${techniqueType}${techniqueNumber}`;
+    });
+    return { ...issue, guideLinks };
+  });
+}
+
 function countIssuesByType(issues) {
   const count = {
     error: 0,
@@ -31,12 +67,13 @@ const defaultErrorResponse = (textError, url) => {
 
 const successResponse = (pa11yResponse, url) => {
   const issues = pa11yResponse.issues;
+  const mappedIssues = mapIssuesWithGuideLink(issues);
   const issueCountByType = countIssuesByType(issues);
   const errorIssues = issues.filter((issue) => issue.typeCode === 1);
   const { countAprovedIssues, accessible } = isAccessible(errorIssues);
 
   return {
-    data: { ...pa11yResponse, pageUrl: url },
+    data: { ...pa11yResponse, issues: mappedIssues, pageUrl: url },
     ok: true,
     issueCountByType,
     accessible,

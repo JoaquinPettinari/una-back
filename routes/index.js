@@ -5,6 +5,11 @@ import puppeteer from "puppeteer-core";
 import { successResponse, errorResponse } from "../utils/pa11y.js";
 const app = express();
 
+const defaultIncludes = {
+  includeWarnings: true,
+  includeNotices: true,
+};
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
@@ -21,7 +26,12 @@ app.get("/analizar", async (req, res) => {
     }
     console.log("🧑‍🏭 Fetching...");
     if (host.includes("localhost")) {
-      const pa11yResponse = await pa11y(url);
+      const pa11yResponse = await pa11y(url, {
+        ...defaultIncludes,
+        chromeLaunchConfig: {
+          headless: "new",
+        },
+      });
       successResponseData = successResponse(pa11yResponse, url);
     } else {
       const executablePath = await edgeChromium.executablePath();
@@ -35,6 +45,7 @@ app.get("/analizar", async (req, res) => {
 
       const pa11yResponse = await pa11y(url, {
         ignoreUrl: true,
+        ...defaultIncludes,
         browser: browser,
         page: page,
       });

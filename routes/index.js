@@ -18,6 +18,7 @@ app.get("/analizar", async (req, res) => {
   const url = req.query.url;
   const host = req.hostname;
   let successResponseData, browser, page;
+  const start = new Date();
   try {
     if (!url) {
       res.status(404).json({
@@ -42,13 +43,17 @@ app.get("/analizar", async (req, res) => {
       });
       page = await browser.newPage();
       await page.goto(url);
-
+      const end = new Date();
+      console.log(end - start);
+      const start2 = new Date();
       const pa11yResponse = await pa11y(url, {
         ignoreUrl: true,
         ...defaultIncludes,
         browser: browser,
         page: page,
       });
+      const end2 = new Date();
+      console.log(end2 - start2);
       successResponseData = successResponse(pa11yResponse, url);
     }
     console.log("✅ Fetch success ");

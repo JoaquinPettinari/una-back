@@ -13,12 +13,4 @@
       "dest": "index.js"
      }
     ],
-    "functions": {
-        "index.js": {
-          "maxDuration": 30
-        },
-        "routes/*.js": {
-          "maxDuration": 30
-        }
-      }    
    }

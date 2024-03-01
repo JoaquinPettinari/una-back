@@ -36,12 +36,15 @@ app.get("/analizar", async (req, res) => {
       successResponseData = successResponse(pa11yResponse, url);
     } else {
       const executablePath = await edgeChromium.executablePath();
+      console.log("Tengo el edge");
       browser = await puppeteer.launch({
         executablePath,
         args: [...edgeChromium.args, "--disable-extensions"],
         headless: true,
       });
+      console.log("Instancio browser");
       page = await browser.newPage();
+      console.log("Tengo la page");
       await page.goto(url);
       const end = new Date();
       console.log(end - start);

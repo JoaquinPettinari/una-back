@@ -8,14 +8,15 @@ const app = express();
 const defaultIncludes = {
   includeWarnings: true,
   includeNotices: true,
+  timeout: 20000,
 };
 
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.get("/analizar", async (req, res) => {
-  const url = req.query.url;
+app.post("/analizar", async (req, res) => {
+  const url = req.body.url;
   const host = req.hostname;
   let successResponseData, browser, page;
   try {

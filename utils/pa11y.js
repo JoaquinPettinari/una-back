@@ -83,7 +83,7 @@ const successResponse = (pa11yResponse, url) => {
 
 const errorResponse = (error, url) => {
   console.log(error);
-  if (error.name === "TimeoutError") {
+  if (error.message.includes("timed out")) {
     return {
       ...defaultErrorResponse(
         "El análisis de la página ha tardado demasiado tiempo. Por favor, intente mas tarde.",
@@ -96,6 +96,10 @@ const errorResponse = (error, url) => {
         `Error al parsear la URL ${url}, pruebe escribiendo http:// adelante`,
         url
       ),
+    };
+  } else if (error.message.includes("net::ERR_NAME_NOT_RESOLVED")) {
+    return {
+      ...defaultErrorResponse(`No se encuentra la URL: ${url}`, url),
     };
   } else {
     return {

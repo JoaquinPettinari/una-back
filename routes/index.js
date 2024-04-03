@@ -17,6 +17,7 @@ app.get("/", (req, res) => {
 
 app.post("/analizar", async (req, res) => {
   const url = req.body.url;
+  const actions = req.body.actions;
   const host = req.hostname;
   let successResponseData, browser, page;
   try {
@@ -24,6 +25,12 @@ app.post("/analizar", async (req, res) => {
       res.status(404).json({
         error: "Sin url",
       });
+    }
+    if (actions) {
+      defaultIncludes.actions = actions
+        .split("\n")
+        .map((line) => line.replace(/\r$/, ""))
+        .filter((line) => line.trim() !== "");
     }
     console.log("🧑‍🏭 Fetching...");
     if (host.includes("localhost")) {

@@ -15,6 +15,28 @@ const techniqueTypeFull = {
   T: "text",
 };
 
+function parsedPrinciple(code) {
+  const parts = code.split(".");
+
+  const principio = extractNumberAfterPrefix(parts, "Principle");
+  const pauta = extractNumberAfterPrefix(parts, "Guideline");
+  const criterio = parts[3];
+  return {
+    principio: principio !== null ? parseInt(principio, 10) : null,
+    pauta: pauta !== null ? parseFloat(pauta.replace("_", ".")) : null,
+    criterio: criterio !== null ? criterio.replaceAll("_", ".") : null,
+  };
+}
+
+function extractNumberAfterPrefix(parts, prefix) {
+  const part = parts.find((p) => p.startsWith(prefix));
+  if (part) {
+    const numberPart = part.replace(prefix, "");
+    return numberPart;
+  }
+  return null;
+}
+
 function mapIssuesWithGuideLink(issues) {
   return issues.map((issue) => {
     const parts = issue.code.split("_").pop();
@@ -30,7 +52,11 @@ function mapIssuesWithGuideLink(issues) {
       const techniqueNumber = code.match(/[0-9]+/)[0];
       return `${baseUrl}${techniqueTypeFull[techniqueType]}/${techniqueType}${techniqueNumber}`;
     });
-    return { ...issue, guideLinks };
+    return {
+      ...issue,
+      guideLinks,
+      parsedPrinciple: parsedPrinciple(issue.code),
+    };
   });
 }
 
@@ -47,7 +73,10 @@ function countIssuesByType(issues) {
 }
 
 function isAccessible(issues) {
-  const uniqueCodes = new Set(issues.map((issue) => issue.code));
+  const criterioList = issues.map((issue) => issue?.parsedPrinciple?.criterio);
+  const uniqueCodes = new Set(
+    issues.map((issue) => issue?.parsedPrinciple?.criterio)
+  );
   return {
     accessible: uniqueCodes.size <= 8,
     countAprovedIssues: 38 - uniqueCodes.size,
@@ -69,7 +98,7 @@ const successResponse = (pa11yResponse, url) => {
   const issues = pa11yResponse.issues;
   const mappedIssues = mapIssuesWithGuideLink(issues);
   const issueCountByType = countIssuesByType(issues);
-  const errorIssues = issues.filter((issue) => issue.typeCode === 1);
+  const errorIssues = mappedIssues.filter((issue) => issue.typeCode === 1);
   const { countAprovedIssues, accessible } = isAccessible(errorIssues);
 
   return {

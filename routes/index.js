@@ -32,7 +32,7 @@ app.post("/analizar", async (req, res) => {
         .map((line) => line.replace(/\r$/, ""))
         .filter((line) => line.trim() !== "");
     }
-    console.log("🧑‍🏭 Fetching... ");
+    console.log("🧑‍🏭 Fetching...");
     if (host.includes("localhost") || true) {
       const pa11yResponse = await pa11y(url, {
         ...defaultIncludes,

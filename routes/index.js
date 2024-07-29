@@ -33,7 +33,7 @@ app.post("/analizar", async (req, res) => {
         .filter((line) => line.trim() !== "");
     }
     console.log("🧑‍🏭 Fetching...");
-    if (host.includes("localhost") || true) {
+    if (host.includes("localhost")) {
       const pa11yResponse = await pa11y(url, {
         ...defaultIncludes,
         chromeLaunchConfig: {
